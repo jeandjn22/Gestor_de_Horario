@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GestordeHorario — Armador Académico</title>
+    <!-- Estilos de la aplicación -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Estilos exclusivos de impresión -->
+    <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+
+    <!-- Encabezado Principal -->
+    <header class="main-header">
+        <div class="header-container">
+            <h1 class="brand-title">Gestor <span>de</span> Horario</h1>
+            <p class="brand-subtitle">Proyecto de Lenguajes para Clientes Web</p>
+        </div>
+    </header>
+
+    <!-- Contenedor de la Aplicación -->
+    <main class="app-container">
+        
+        <!-- SECCIÓN IZQUIERDA: Catálogo, Filtros y Formulario Manual -->
+        <section class="left-panel">
+            <!-- Panel de Control y Configuración de UC -->
+            <div class="card config-card">
+                <h2>Configuración</h2>
+                <div class="form-group">
+                    <label for="tope-uc-input">Tope de Unidades de Crédito (UC):</label>
+                    <input type="number" id="tope-uc-input" value="28" min="1">
+                </div>
+            </div>
+
+            <!-- Filtros del Catálogo -->
+            <div class="card catalog-filters-card">
+                <h2>Catálogo de Materias</h2>
+                <div class="filter-controls">
+                    <input type="text" id="search-input" placeholder="Buscar por nombre o código...">
+                    <select id="trimestre-filter">
+                        <option value="">Todos los trimestres</option>
+                        <option value="1">1° Trimestre</option>
+                        <option value="2">2° Trimestre</option>
+                        <option value="3">3° Trimestre</option>
+                        <option value="4">4° Trimestre</option>
+                        <option value="5">5° Trimestre</option>
+                    </select>
+                </div>
+                <!-- Botón de atajo rápido -->
+                <button id="btn-add-trimestre" class="btn btn-secondary">Agregar Trimestre Completo</button>
+            </div>
+
+            <!-- Lista de Materias del Catálogo -->
+            <div class="card catalog-list-card">
+                <div id="catalog-container" class="scrollable-list">
+                    <!-- Las materias se renderizan dinámicamente aquí con JavaScript -->
+                </div>
+            </div>
+
+            <!-- Botón para abrir modal de Materia Manual -->
+            <button id="btn-open-manual-form" class="btn btn-primary btn-block">Registrar Materia Manual</button>
+        </section>
+
+        <!-- SECCIÓN CENTRAL: Selección actual y Combinaciones -->
+        <section class="center-panel">
+            <!-- Resumen de la Selección -->
+            <div class="card selection-card">
+                <div class="selection-header">
+                    <h2>Materias Seleccionadas</h2>
+                    <div class="selection-counters">
+                        <span id="counter-materias">0 Materias</span>
+                        <span id="counter-uc" class="badge">0 / 28 UC</span>
+                    </div>
+                </div>
+                <div id="selection-container">
+                    <!-- Listado de materias seleccionadas, fijadas o excluidas -->
+                    <p class="empty-state">No has seleccionado ninguna materia todavía.</p>
+                </div>
+                <button id="btn-generate" class="btn btn-success btn-block" disabled>Generar Horarios</button>
+            </div>
+
+            <!-- Panel de Preferencias Post-Generación -->
+            <div id="preferences-panel" class="card hidden">
+                <h2>Filtrar Opciones Generadas</h2>
+                <div class="preferences-grid">
+                    <div class="form-group">
+                        <label>Días Libres:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="LUN"> Lun</label>
+                            <label><input type="checkbox" value="MAR"> Mar</label>
+                            <label><input type="checkbox" value="MIE"> Mié</label>
+                            <label><input type="checkbox" value="JUE"> Jue</label>
+                            <label><input type="checkbox" value="VIE"> Vie</label>
+                            <label><input type="checkbox" value="SAB"> Sáb</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-hora-entrada">Entrada mínima:</label>
+                        <input type="time" id="filter-hora-entrada">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-hora-salida">Salida máxima:</label>
+                        <input type="time" id="filter-hora-salida">
+                    </div>
+                </div>
+                <div class="sorting-group">
+                    <label for="sort-select">Ordenar por:</label>
+                    <select id="sort-select">
+                        <option value="DIAS">Menos días de asistencia</option>
+                        <option value="HORAS_MUERTAS">Menos horas muertas</option>
+                        <option value="SALIDA_TEMPRANA">Salida más temprana</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DERECHA: Visualización de la Rejilla Semanal -->
+        <section class="right-panel">
+            <div class="card schedule-view-card">
+                <div class="schedule-header">
+                    <h2>Opciones de Horario</h2>
+                    <div id="schedule-navigation" class="hidden">
+                        <button id="btn-prev-schedule" class="btn btn-nav">&larr;</button>
+                        <span id="schedule-counter">Opción 0 de 0</span>
+                        <button id="btn-next-schedule" class="btn btn-nav">&rarr;</button>
+                    </div>
+                </div>
+
+                <!-- Rejilla CSS Grid Semanal -->
+                <div id="schedule-grid-wrapper" class="hidden">
+                    <div class="metrics-bar">
+                        <span id="metric-dias">Días: 0</span> | 
+                        <span id="metric-muertas">Horas Muertas: 0h</span> | 
+                        <span id="metric-rango">Rango: -- a --</span>
+                    </div>
+                    
+                    <div class="weekly-grid">
+                        <!-- Cabecera de días -->
+                        <div class="grid-header-cell text-muted">Hora</div>
+                        <div class="grid-header-cell">LUN</div>
+                        <div class="grid-header-cell">MAR</div>
+                        <div class="grid-header-cell">MIE</div>
+                        <div class="grid-header-cell">JUE</div>
+                        <div class="grid-header-cell">VIE</div>
+                        <div class="grid-header-cell">SAB</div>
+
+                        <!-- Las filas horarias y tarjetas de sesiones se inyectarán aquí por JS -->
+                    </div>
+
+                    <button id="btn-save-definitive" class="btn btn-success btn-block" style="margin-top: 15px;">Definir Horario Final</button>
+                </div>
+
+                <div id="schedule-empty-state">
+                    <p class="empty-state">Selecciona materias y haz clic en "Generar Horarios" para visualizar las rejillas semanales.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- VISTA DE RESUMEN FINAL / IMPRIMIBLE (Oculta por defecto en pantalla) -->
+    <div id="summary-view" class="hidden container">
+        <!-- Se completará dinámicamente según el Módulo 4.9 -->
+    </div>
+
+    <!-- MODALES DE LA APLICACIÓN (Cero alert/confirm/prompt nativos) -->
+    <div id="modal-container" class="modal-overlay hidden">
+        <!-- El contenido del formulario manual o confirmaciones se cargará aquí -->
+    </div>
+
+    <!-- CARGA DE DATA PROVISTA -->
+    <script src="data/bloques.js"></script>
+    <script src="data/materias.js"></script>
+
+    <!-- CARGA DE LÓGICA Y MÓDULOS DEL PROYECTO -->
+    <script src="js/tiempo.js"></script>
+    <script src="js/datos.js"></script>
+    <script src="js/choques.js"></script>
+    <script src="js/generador.js"></script>
+    <script src="js/preferencias.js"></script>
+    <script src="js/catalogo.js"></script>
+    <script src="js/seleccion.js"></script>
+    <script src="js/formulario.js"></script>
+    <script src="js/rejilla.js"></script>
+    <script src="js/resumen.js"></script>
+    
+    <!-- PUNTO DE ENTRADA CENTRAL -->
+    <script src="js/app.js"></script>
+</body>
+</html>
