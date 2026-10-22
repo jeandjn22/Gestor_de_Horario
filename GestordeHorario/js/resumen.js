@@ -5,7 +5,6 @@
 function establecerHorarioDefinitivo(combinacionElegida) {
     const appContainer = document.querySelector('.app-container');
     const summaryView = document.getElementById('summary-view');
-    const header = document.querySelector('.main-header');
 
     if (!appContainer || !summaryView) return;
 
@@ -28,7 +27,33 @@ function establecerHorarioDefinitivo(combinacionElegida) {
         card.style.cursor = 'default';
     });
 
-    // Construir la maquetación semántica de la hoja final
+    
+    let htmlFilasTabla = "";
+    combinacionElegida.forEach(asignacion => {
+        // Formatear los horarios legibles de cada sesión
+        const listaHorarios = asignacion.seccionInfo.horario.map(ses => {
+            return `${ses.dia}: ${obtenerHorarioLegible(ses.bloques)}`;
+        });
+        const horariosTexto = listaHorarios.join('<br>');
+
+        // Extraer las aulas correspondientes
+        const listaAulas = asignacion.seccionInfo.horario.map(ses => ses.aula);
+        const aulasTexto = listaAulas.join(' / ');
+
+        // Acumular la fila HTML de forma limpia con variables ya procesadas
+        htmlFilasTabla += `
+            <tr>
+                <td><strong>${asignacion.codigoMateria}</strong></td>
+                <td>${asignacion.nombreMateria}</td>
+                <td><span class="badge">${asignacion.seccionInfo.id}</span></td>
+                <td>${asignacion.seccionInfo.profesor}</td>
+                <td>${horariosTexto}</td>
+                <td>📍 ${aulasTexto}</td>
+            </tr>
+        `;
+    });
+
+    // Maquetación semántica de la hoja final inyectando las filas precalculadas
     summaryView.innerHTML = `
         <div class="print-actions-bar">
             <button id="btn-back-to-app" class="btn btn-secondary">&larr; Volver a Editar</button>
@@ -44,7 +69,6 @@ function establecerHorarioDefinitivo(combinacionElegida) {
             </div>
 
             <div class="print-grid-container">
-                <!-- Se inyecta la copia exacta de la rejilla CSS Grid -->
                 <h3>Esquema Semanal Distribuido</h3>
                 <div class="grid-wrapper-print"></div>
             </div>
@@ -63,25 +87,7 @@ function establecerHorarioDefinitivo(combinacionElegida) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${combinacionElegida.map(asignacion => {
-                            // Mapear los horarios de cada sesión a texto plano e imprimible
-                            const horariosTexto = asignacion.seccionInfo.horario.map(ses => {
-                                return `ses.dia: {obtenerHorarioLegible(ses.bloques)}`;
-                            }).join('<br>');
-
-                            const aulasTexto = asignacion.seccionInfo.horario.map(ses => ses.aula).join(' / ');
-
-                            return `
-                                <tr>
-                                    <td><strong>\${asignacion.codigoMateria}</strong></td>
-                                    <td>\${asignacion.nombreMateria}</td>
-                                    <td><span class="badge">\${asignacion.seccionInfo.id}</span></td>
-                                    <td>\${asignacion.seccionInfo.profesor}</td>
-                                    <td>\${horariosTexto}</td>
-                                    <td>📍 \${aulasTexto}</td>
-                                </tr>
-                            `;
-                        }).join('')}
+                        ${htmlFilasTabla}
                     </tbody>
                 </table>
             </div>
