@@ -1,6 +1,4 @@
-# Gestor_de_Horario
-
-# Gestor de Horario — Armador Académico Eficiente
+# Gestor de Horario
 
 **Curso:** Desarrollo de Lenguajes para Clientes Web  
 **Profesor:** Ing. Victor Kneider  
