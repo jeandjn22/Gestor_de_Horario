@@ -17,6 +17,13 @@ function inicializarEventosSeleccion() {
                 return;
             }
 
+            // --- IMPEDIR EXCEDER EL MÁXIMO DE 28 UC ---
+            if (nuevoTope > 28) {
+                alert("El tope máximo de Unidades de Crédito institucional permitido es de 28 UC.");
+                e.target.value = EstadoApp.topeUC;
+                return;
+            }
+
             if (nuevoTope < ucActuales) {
                 alert(`No puedes bajar el tope por debajo de las UC ya seleccionadas (${ucActuales} UC).`);
                 e.target.value = EstadoApp.topeUC;
