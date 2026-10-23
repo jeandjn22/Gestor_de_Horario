@@ -1,0 +1,113 @@
+/* Ocultar absolutamente todos los elementos de la interfaz interactiva */
+.main-header,
+.app-container,
+.print-actions-bar,
+.btn,
+#modal-container {
+    display: none !important;
+}
+
+/* Configurar la hoja para impresión física */
+@page {
+    size: letter landscape; /* Formato horizontal para maximizar el CSS Grid */
+    margin: 1cm;
+}
+
+body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.printable-document {
+    display: block !important;
+    width: 100%;
+}
+
+.print-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 10px;
+}
+
+.print-header h2 {
+    font-size: 18pt;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    border-left: 3px solid #000000;
+    padding-left: 8px;
+}
+
+/* Forzar que la rejilla de CSS Grid mantenga sus proporciones en papel */
+.grid-wrapper-print .weekly-grid {
+    display: grid !important;
+    grid-template-columns: 55px repeat(6, 1fr) !important;
+    grid-template-rows: 25px repeat(45, 10px) !important;
+    background-color: #ffffff !important;
+    border: 1px solid #000000 !important;
+    gap: 1px !important;
+    page-break-inside: avoid;
+}
+
+.grid-wrapper-print .grid-header-cell {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    font-size: 8pt !important;
+    border: 1px solid #000000 !important;
+}
+
+.grid-wrapper-print .grid-session-card {
+    background-color: #f1f5f9 !important; /* Fondo gris claro neutral para ahorrar tinta */
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Tabla Estructurada Resumen */
+.summary-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    page-break-inside: avoid;
+}
+
+.summary-data-table th, 
+.summary-data-table td {
+    border: 1px solid #000000;
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 9pt;
+}
+
+.summary-data-table th {
+    background-color: #e2e8f0 !important;
+    font-weight: bold;
+}
+
+/* Bloque de Firmas Inferior */
+.print-signature-block {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    page-break-inside: avoid;
+}
+
+.signature-line {
+    width: 200px;
+    border-top: 1px solid #000000;
+    text-align: center;
+    font-size: 9pt;
+    padding-top: 5px;
+}
