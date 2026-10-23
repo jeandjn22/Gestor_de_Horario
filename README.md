@@ -1,6 +1,6 @@
 # Gestor de Horario
 
-**Curso:** Desarrollo de Lenguajes para Clientes Web  
+**Materia:** Desarrollo de Lenguajes para Clientes Web  
 **Profesor:** Ing. Victor Kneider  
 **Integrantes:** Jean D'Joumblat - Andres Pereira
 
