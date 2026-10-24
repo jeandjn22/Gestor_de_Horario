@@ -1,5 +1,3 @@
-// js/formulario.js
-
 let seccionCount = 0;
 
 /**
@@ -132,7 +130,7 @@ function agregarSeccionAFormulario(datosPreexistentes = null) {
                 </div>
                 <div class="form-group">
                     <label>Aula:</label>
-                    <input type="text" class="ses-aula-input" placeholder="Ej: LAB-1" value="${datosPreexistentes ? datosPreexistentes.horario?.aula : ''}">
+                    <input type="text" class="ses-aula-input" placeholder="Ej: LAB-1" value="${datosPreexistentes ? datosPreexistentes.horario[0]?.aula : ''}">
                     <span class="error-msg err-ses-aula"></span>
                 </div>
             </div>
@@ -148,11 +146,11 @@ function agregarSeccionAFormulario(datosPreexistentes = null) {
     `;
 
     // Configurar valores por defecto en caso de que sean datos preexistentes
-    if (datosPreexistentes && datosPreexistentes.horario) {
-        secCard.querySelector('.ses-dia-select').value = datosPreexistentes.horario.dia;
+    if (datosPreexistentes && datosPreexistentes.horario[0]) {
+        secCard.querySelector('.ses-dia-select').value = datosPreexistentes.horario[0].dia;
         const selectBloques = secCard.querySelector('.ses-bloques-select');
         Array.from(selectBloques.options).forEach(opt => {
-            if (datosPreexistentes.horario.bloques.includes(opt.value)) opt.selected = true;
+            if (datosPreexistentes.horario[0].bloques.includes(opt.value)) opt.selected = true;
         });
     }
 
@@ -215,96 +213,94 @@ function procesarSubmitFormulario(e) {
 
         const listaSeccionesProcesadas = [];
 
-    formSectionCards.forEach(card => {
-        const inputSecId = card.querySelector('.sec-id-input').value.trim();
-        const inputProfesor = card.querySelector('.sec-profesor-input').value.trim();
-        const selectDia = card.querySelector('.ses-dia-select').value;
-        const inputAula = card.querySelector('.ses-aula-input').value.trim();
-        const selectedBloques = Array.from(card.querySelector('.ses-bloques-select').options)
-                                      .filter(opt => opt.selected)
-                                      .map(opt => opt.value);
+        formSectionCards.forEach(card => {
+            const inputSecId = card.querySelector('.sec-id-input').value.trim();
+            const inputProfesor = card.querySelector('.sec-profesor-input').value.trim();
+            const selectDia = card.querySelector('.ses-dia-select').value;
+            const inputAula = card.querySelector('.ses-aula-input').value.trim();
+            const selectedBloques = Array.from(card.querySelector('.ses-bloques-select').options)
+                                        .filter(opt => opt.selected)
+                                        .map(opt => opt.value);
 
-        let secValida = true;
+            let secValida = true;
 
-        if (!inputSecId) {
-            card.querySelector('.err-sec-id').textContent = "Identificador requerido.";
-            secValida = false;
-        } else if (listaSeccionesProcesadas.some(s => s.id === inputSecId)) {
-            card.querySelector('.err-sec-id').textContent = "ID de sección duplicado en esta materia.";
-            secValida = false;
-        }
+            if (!inputSecId) {
+                card.querySelector('.err-sec-id').textContent = "Identificador requerido.";
+                secValida = false;
+            } else if (listaSeccionesProcesadas.some(s => s.id === inputSecId)) {
+                card.querySelector('.err-sec-id').textContent = "ID de sección duplicado en esta materia.";
+                secValida = false;
+            }
 
-        if (!inputProfesor) {
-            card.querySelector('.err-sec-profesor').textContent = "Escriba el nombre del docente.";
-            secValida = false;
-        }
+            if (!inputProfesor) {
+                card.querySelector('.err-sec-profesor').textContent = "Escriba el nombre del docente.";
+                secValida = false;
+            }
 
-        if (!inputAula) {
-            card.querySelector('.err-ses-aula').textContent = "Aula requerida.";
-            secValida = false;
-        }
+            if (!inputAula) {
+                card.querySelector('.err-ses-aula').textContent = "Aula requerida.";
+                secValida = false;
+            }
 
-        if (selectedBloques.length === 0) {
-            card.querySelector('.err-ses-bloques').textContent = "Debe marcar al menos un bloque horario.";
-            secValida = false;
-        } else {
-            // Validación Cruzada Obligatoria con js/tiempo.js (Consecutivos y Mismo Tipo)
-            if (typeof sonBloquesConsecutivosYDelMismoTipo === 'function') {
-                if (!sonBloquesConsecutivosYDelMismoTipo(selectedBloques)) {
-                    card.querySelector('.err-ses-bloques').textContent = "Los bloques deben ser consecutivos y pertenecer al mismo tipo (Regulares o Laboratorios).";
-                    secValida = false;
+            if (selectedBloques.length === 0) {
+                card.querySelector('.err-ses-bloques').textContent = "Debe marcar al menos un bloque horario.";
+                secValida = false;
+            } else {
+                // Validación Cruzada Obligatoria con js/tiempo.js (Consecutivos y Mismo Tipo)
+                if (typeof sonBloquesConsecutivosYDelMismoTipo === 'function') {
+                    if (!sonBloquesConsecutivosYDelMismoTipo(selectedBloques)) {
+                        card.querySelector('.err-ses-bloques').textContent = "Los bloques deben ser consecutivos y pertenecer al mismo tipo (Regulares o Laboratorios).";
+                        secValida = false;
+                    }
                 }
             }
-        }
 
-        if (!secValida) {
-            formularioValido = false;
-        } else {
-            listaSeccionesProcesadas.push({
-                id: inputSecId,
-                profesor: inputProfesor,
-                horario: [
-                    {
-                        dia: selectDia,
-                        aula: inputAula,
-                        bloques: selectedBloques
-                    }
-                ]
-            });
-        }
-    });
+            if (!secValida) {
+                formularioValido = false;
+            } else {
+                listaSeccionesProcesadas.push({
+                    id: inputSecId,
+                    profesor: inputProfesor,
+                    horario: [
+                        {
+                            dia: selectDia,
+                            aula: inputAula,
+                            bloques: selectedBloques
+                        }
+                    ]
+                });
+            }
+        });
 
-    // Si todas las validaciones integradas pasaron con éxito, se almacena en memoria
-    if (formularioValido) {
-        const nuevaMateriaManual = {
-            codigo: txtCodigo,
-            nombre: txtNombre,
-            trimestre: numTrimestre,
-            uc: numUC,
-            secciones: listaSeccionesProcesadas
-        };
+        // Si todas las validaciones integradas pasaron con éxito, se almacena en memoria
+        if (formularioValido) {
+            const nuevaMateriaManual = {
+                codigo: txtCodigo,
+                nombre: txtNombre,
+                trimestre: numTrimestre,
+                uc: numUC,
+                secciones: listaSeccionesProcesadas
+            };
 
-        if (agregarMateriaManual(nuevaMateriaManual)) {
-            cerrarModalFormulario();
-            if (typeof renderizarCatalogo === 'function') renderizarCatalogo();
+            if (agregarMateriaManual(nuevaMateriaManual)) {
+                cerrarModalFormulario();
+                if (typeof renderizarCatalogo === 'function') renderizarCatalogo();
+            }
         }
     }
-}
 
-function mostrarErrorCampo(idElemento, mensaje) {
-    const el = document.getElementById(idElemento);
-    if (el) {
-        el.textContent = mensaje;
-        el.classList.add('active');
+    function mostrarErrorCampo(idElemento, mensaje) {
+        const el = document.getElementById(idElemento);
+        if (el) {
+            el.textContent = mensaje;
+            el.classList.add('active');
+        }
     }
-}
 
-function cerrarModalFormulario() {
-    const modalContainer = document.getElementById('modal-container');
-    if (modalContainer) {
-        modalContainer.classList.add('hidden');
-        modalContainer.innerHTML = "";
+    function cerrarModalFormulario() {
+        const modalContainer = document.getElementById('modal-container');
+        if (modalContainer) {
+            modalContainer.classList.add('hidden');
+            modalContainer.innerHTML = "";
+        }
     }
-}
-
-
