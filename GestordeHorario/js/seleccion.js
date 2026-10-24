@@ -259,7 +259,7 @@ function renderizarSeleccion() {
                 <button class="btn-remove-selection" style="background:none; border:none; color:var(--error); font-weight:bold; cursor:pointer;">&times;</button>
             </div>
             
-            ${coMateria ? `<div class="alert alert-error-inline">⚠️ Incompatible con: <strong>\${coMateria}</strong> (Todas sus secciones chocan)</div>` : ''}
+            ${coMateria ? `<div class="alert alert-error-inline">⚠️ Incompatible con: <strong>${coMateria}</strong> (Todas sus secciones chocan)</div>` : ''}
 
             <div class="selection-item-controls">
                 <div class="form-group-inline">
